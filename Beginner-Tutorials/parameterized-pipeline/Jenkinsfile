@@ -3,56 +3,60 @@ pipeline {
 
     parameters {
         string(name: 'USER_NAME', defaultValue: 'Devesh', description: 'Enter your name')
-        choice(name: 'ENVIRONMENT' choice: ['DEV', 'QA', 'PROD'], description: 'Select Deployment Environment')
+        choice(name: 'ENVIRONMENT', choices: ['DEV', 'QA', 'PROD'], description: 'Select Deployment Environment')
         booleanParam(name: 'ENABLE_DEBUG', defaultValue: false, description: 'Enable Debug Mode')
     }
 
     environment {
-        DEPLOY_PATH="/home/myapp" //Simulating deployment path
+        DEPLOY_PATH = "/home/myapp" /* Simulating deployment path */
     }
 
-    stages{
+    stages {
         stage('Initialize') {
             steps {
                 script {
                     echo "Build started by: ${params.USER_NAME}"
-                    ehco "Target Environment: ${params.ENVIRONMENT}"
+                    echo "Target Environment: ${params.ENVIRONMENT}"
                 }
             }
         }
-        stage('Build Application'){
-            steps{
-                script{
+
+        stage('Build Application') {
+            steps {
+                script {
                     echo "Building Application...."
                     echo "Building Application completed"
                     sleep 2
                 }
             }
         }
-        stage('Deployment to Environment'){
-            steps{
-                script{
-                    if (params.ENVIRONMENT == "PROD"){
-                        echo "Waiting for approval before deploying to PROD.."
+
+        stage('Deployment to Environment') {
+            steps {
+                script {
+                    if (params.ENVIRONMENT == "PROD") {
+                        echo "Waiting for approval before deploying to PROD..."
                         input message: 'Approve deployment to PROD?', ok: 'Deploy'
                     }
                     echo "Deploying application to ${params.ENVIRONMENT} at ${env.DEPLOY_PATH}"
-                    // Simulating Deployment
-                    echo "Deploying Application...."
+                    echo "Deploying Application..."
                     echo "Application has been deployed to ${params.ENVIRONMENT}"
                 }
             }
         }
-        stage('Post Deployment Checks'){
-            steps{
-                echo "Running post-deployment checks..."
-                if (params.ENABLE_DEBUG) {
-                    echo "Debug Mode: ENABLED"
-                }
-                else echo "Debug Mode: DISABLED"
 
-                sleep 1
-                echo "Deployment Successfully Completed"
+        stage('Post Deployment Checks') {
+            steps {
+                script {
+                    echo "Running post-deployment checks..."
+                    if (params.ENABLE_DEBUG) {
+                        echo "Debug Mode: ENABLED"
+                    } else {
+                        echo "Debug Mode: DISABLED"
+                    }
+                    sleep 1
+                    echo "Deployment Successfully Completed"
+                }
             }
         }
     }
